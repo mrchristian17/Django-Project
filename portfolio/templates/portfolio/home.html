@@ -1,0 +1,15 @@
+{% extends "portfolio/base.html" %}
+{% block content %}
+	{% for project in projects %}
+		<article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="#">{{ project.language }}</a>
+              <small class="text-muted">{{ project.date_completed }}</small>
+            </div>
+            <h2><a class="article-title" href="#">{{ project.name }} </a></h2>
+            <p class="article-content">{{ project.description }}</p>
+          </div>
+        </article>
+	{% endfor %}
+{% endblock content %}
