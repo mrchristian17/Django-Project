@@ -8,7 +8,7 @@
           <a class="mr-2" href="#">{{ project.language }}</a>
           <small class="text-muted">{{ project.date_completed|date:"F d, Y" }}</small>
         </div>
-        <h2><a class="article-title" href="#">{{ project.name }} </a></h2>
+        <h2><a class="article-title" href="{% url 'project_detail' project.id %}">{{ project.name }} </a></h2>
         <p class="article-content">{{ project.description }}</p>
       </div>
     </article>

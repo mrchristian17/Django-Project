@@ -1,28 +1,64 @@
 from django.shortcuts import render
+from django.contrib.auth.mixins import (
+	LoginRequiredMixin, 
+	UserPassesTestMixin
+)
+from django.views.generic import ( 
+	ListView, 
+	DetailView, 
+	CreateView,
+	UpdateView,
+	DeleteView
+)
 from .models import Project
 
-projects = [
-	{
-	'name': 'Subreddit Keyword Search',
-	'language': "Python",
-	'description': 'Created an application that searches r/ProgrammerHumor using any keyword and populates an excel file in order of the score',
-	'date_completed': 'October 14, 2020',
-	},
-	{
-	'name': 'Website portfolio',
-	'language': "Python, Django",
-	'description': 'Created this website using Django and programmed the server using Linode',
-	'date_completed': 'January 11, 2020',
-	},
-	
-
-]
 
 def home(request):
 	context = {
 		'projects': Project.objects.all()
 	}
 	return render(request, 'portfolio/home.html', context)
+
+class ProjectListView(ListView):
+	model = Project
+	template_name = 'portfolio/home.html' #<app>/<model>_<viewtype>.html
+	context_object_name = 'projects'
+	ordering = ['-date_completed']
+
+class ProjectDetailView(DetailView):
+	model = Project
+
+class ProjectCreateView(LoginRequiredMixin, CreateView):
+	model = Project
+	fields = ['name', 'language', 'description']
+
+	def form_valid(self, form):
+		form.instance.author = self.request.user
+		return super().form_valid(form)
+
+class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+	model = Project
+	fields = ['name', 'language', 'description']
+
+	def form_valid(self, form):
+		form.instance.author = self.request.user
+		return super().form_valid(form)
+
+	def test_func(self):
+		project = self.get_object()
+		if self.request.user == project.author:
+			return True
+		return False
+
+class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+	model = Project
+	success_url = '/'
+
+	def test_func(self):
+		project = self.get_object()
+		if self.request.user == project.author:
+			return True
+		return False
 
 def about(request):
 	return render(request, 'portfolio/about.html', {'title': 'About'})
